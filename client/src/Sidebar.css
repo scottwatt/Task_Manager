@@ -1,0 +1,92 @@
+.task-sidebar h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+  
+  .task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-details {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  .task-details p {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+  }
+  
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-right: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  button:last-child {
+    margin-right: 0;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .task-title{
+    display: flex;
+    justify-content: center;
+
+  }
+  
+  .task-item {
+    position: relative;
+  }
+  
+  .task-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+  }
+  
+  .actions-dropdown {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+  
+  .actions-dropdown button {
+    display: block;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    padding: 2px 5px;
+  }
+  
+  .actions-dropdown button:hover {
+    background-color: #f1f1f1;
+  }
+
+  .task-item-content {
+    position: relative;
+  }

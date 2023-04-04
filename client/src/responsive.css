@@ -1,0 +1,86 @@
+.task-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    overflow-y: auto;
+    z-index: 1000;
+    background-color: #f8f9fa;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .task-sidebar.hidden {
+    transform: translateX(-100%);
+  }
+  
+  .task-sidebar.visible {
+    transform: translateX(0);
+  }
+
+  .calendar-container {
+    transition: width 0.3s ease-in-out;
+  }
+  
+  ul{
+    padding: 10px;
+    }
+
+ .toggle-tasks-btn {
+    display: none;
+    }
+
+    
+  /* Responsive layout for small screens */
+  @media (max-width: 768px) {
+    .app-container {
+      flex-direction: column;
+    }
+  
+    .task-sidebar {
+      width: 100%;
+    }
+  
+    .calendar-container {
+      width: 100%;
+    }
+
+    ul{
+        padding: 0;
+        max-width: 90%;
+    }
+    
+    .toggle-tasks-btn {
+        display: block;
+        margin: 10px 0;
+      }
+    
+  }
+  
+  /* Responsive layout for larger screens */
+  @media (min-width: 769px) {
+    .app-container {
+        display: flex;
+        flex-direction: row;
+      }
+    
+      .task-sidebar {
+        position: static;
+        width: 100%;
+      }
+    
+      .calendar-container {
+        width: 100%;
+      }
+    
+      .calendar-container.full-width {
+        width: 100%;
+      }
+      .calendar-container.half-width {
+        width: 50%;
+      }
+
+      ul{
+        padding:10px;
+        max-width: 95%;
+      }
+  }
