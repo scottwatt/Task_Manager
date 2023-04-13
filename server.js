@@ -24,7 +24,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.REACT_APP_URL || 'http://localhost:3000',
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -60,7 +60,7 @@ app.post("/signup", async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
+    secure: true, // Set to true if using HTTPS
     sameSite: 'strict',
     maxAge: 60 * 60 * 24 * 1000,
   });
@@ -98,7 +98,7 @@ app.post("/login", async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true,
-    secure: false, // Set to true if using HTTPS
+    secure: true, // Set to true if using HTTPS
     sameSite: 'strict',
     maxAge: 60 * 60 * 24 * 1000,
   });
