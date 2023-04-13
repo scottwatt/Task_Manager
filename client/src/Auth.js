@@ -1,30 +1,52 @@
 // client/src/Auth.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import './authStyles.css';
 
-const Auth = ({onAuthenticated}) => {
+const Auth = ({ onAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [isSignup, setIsSignup] = useState(true);
+  const [isSignup, setIsSignup] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const endpoint = isSignup ? "signup" : "login";
+
+    const url = isSignup
+      ? "http://localhost:5001/signup"
+      : "http://localhost:5001/login";
+    const userData = isSignup ? { email, password, username } : { email, password };
+
     try {
-      const response = await axios.post(`http://localhost:5001/${endpoint}`, {
-        email,
-        password,
-        username,
-      });
-      console.log(response.data);
-      // Call the onAuthenticated function here and pass the response data
-      onAuthenticated(response.data);
+      const response = await axios.post(url, userData);
+      const authData = {
+        token: response.data.token,
+        username: response.data.username,
+      };
+
+      // Store authentication and user data in localStorage
+      localStorage.setItem("isAuthenticated", true);
+      localStorage.setItem("token", authData.token);
+      localStorage.setItem("username", authData.username);
+
+      onAuthenticated(authData);
     } catch (error) {
-      console.error(error);
+      console.error("Error during authentication:", error.response.data.message);
     }
   };
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const authStatus = localStorage.getItem("isAuthenticated");
+      if (authStatus) {
+        const token = localStorage.getItem("token");
+        const username = localStorage.getItem("username");
+  
+        onAuthenticated({ token, username });
+      }
+    };
+  
+    checkAuthentication();
+  }, [onAuthenticated]);
   
 
   return (
@@ -64,4 +86,4 @@ const Auth = ({onAuthenticated}) => {
     );
   };
   
-  export default Auth;
+export default Auth;

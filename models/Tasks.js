@@ -20,7 +20,6 @@ const TaskSchema = new mongoose.Schema(
     },
     priority: {
         type: String,
-        required: true,
   },
     start: {
         type: Date,

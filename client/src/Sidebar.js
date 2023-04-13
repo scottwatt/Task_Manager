@@ -17,7 +17,7 @@ const getBackgroundColor = (priority) => {
   }
 };
 
-const Task = ({ task, onEditTask, onRemoveTask }) => {
+const Task = ({ task, onEditTask, onRemoveTask, onCompleteTask }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => {
@@ -38,6 +38,9 @@ const Task = ({ task, onEditTask, onRemoveTask }) => {
         <p>End: {moment(task.end).format("MMM Do YYYY, h:mm a")}</p>
       </div>
       <div className="task-actions">
+        {onCompleteTask && (
+              <button onClick={() => onCompleteTask(task._id)}>Complete</button>
+        )}
         <i className="fa fa-cog" onClick={toggleMenu} />
         {showMenu && (
           <div className="actions-dropdown">
@@ -50,7 +53,14 @@ const Task = ({ task, onEditTask, onRemoveTask }) => {
   );
 };
 
-const TaskSidebar = ({ tasks, onEditTask, onRemoveTask, onClose }) => {
+const TaskSidebar = ({
+  activeTasks,
+  finishedTasks,
+  onEditTask,
+  onRemoveTask,
+  onClose,
+  onCompleteTask,
+}) => {
   const sortTasks = (tasks) => {
     return tasks.sort((a, b) => {
       const timeDiffA = new Date(a.start) - new Date();
@@ -64,17 +74,33 @@ const TaskSidebar = ({ tasks, onEditTask, onRemoveTask, onClose }) => {
     });
   };
 
-  const sortedTasks = sortTasks(tasks);
+  const sortedActiveTasks = sortTasks(activeTasks);
+  const sortedFinishedTasks = sortTasks(finishedTasks);
 
   return (
     <div className="task-sidebar" onClick={onClose}>
-      <div className="task-sidebar-content" onClick={(e) => e.stopPropagation()}>
-      <button className="toggle-tasks-btn" onClick={onClose}>
+      <div
+        className="task-sidebar-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="toggle-tasks-btn" onClick={onClose}>
           Toggle Tasks
         </button>
-        <h2 className="task-title">Tasks</h2>
+        <h2 className="task-title">Active Tasks</h2>
         <ul>
-          {sortedTasks.map((task) => (
+          {sortedActiveTasks.map((task) => (
+            <Task
+              key={task._id}
+              task={task}
+              onEditTask={onEditTask}
+              onRemoveTask={onRemoveTask}
+              onCompleteTask={onCompleteTask}
+            />
+          ))}
+        </ul>
+        <h2 className="task-title">Finished Tasks</h2>
+        <ul>
+          {sortedFinishedTasks.map((task) => (
             <Task
               key={task._id}
               task={task}
@@ -87,6 +113,7 @@ const TaskSidebar = ({ tasks, onEditTask, onRemoveTask, onClose }) => {
     </div>
   );
 };
+
 
 export default TaskSidebar;
 

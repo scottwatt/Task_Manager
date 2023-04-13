@@ -2,6 +2,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -9,15 +11,19 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/Users");
 const Task = require("./models/Tasks");
 
+require("dotenv").config();
+
+
 
 // server.js
-const JWT_SECRET = "your_jwt_secret";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Create an Express app
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
-  origin: '*',
+  origin: 'http://localhost:3000',
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -34,15 +40,33 @@ app.post("/signup", async (req, res) => {
   // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // console.log("Original password:", password);
+  // console.log("Hashed password:", hashedPassword);
+
   // Create a new user
   const user = new User({ username, email, password: hashedPassword });
+  // console.log("User before saving:", user);
+
+  user.skipHash = true;
+
   await user.save();
+
+  // console.log("Saved user:", user);
+  // console.log("Saved user password:", user.password);
 
   // Generate a JWT
   const token = jwt.sign({ userId: user._id }, JWT_SECRET);
 
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false, // Set to true if using HTTPS
+    sameSite: 'strict',
+    maxAge: 60 * 60 * 24 * 1000,
+  });
+
   res.json({ token, userId: user._id, username });
 });
+
 
 // Login route
 app.post("/login", async (req, res) => {
@@ -50,26 +74,42 @@ app.post("/login", async (req, res) => {
 
   // Find the user by email
   const user = await User.findOne({ email });
+  // console.log("Found user:", user);
+  // console.log("Found user password:", user.password);
   if (!user) {
-    return res.status(400).json({ message: "Invalid email or password." });
+    return res.status(400).json({ message: "User not found." });
   }
-
+  
+  
   // Compare the provided password with the stored hashed password
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
-    return res.status(400).json({ message: "Invalid email or password." });
+    // console.log("Invalid password"); // Add logging here
+    // console.log("Entered password:", password);
+    // console.log("Stored hashed password:", user.password);
+    // console.log("Password comparison result:", validPassword);
+    return res.status(400).json({ message: "Invalid password." });
   }
+  
 
   // Generate a JWT
   const token = jwt.sign({ userId: user._id }, JWT_SECRET);
 
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false, // Set to true if using HTTPS
+    sameSite: 'strict',
+    maxAge: 60 * 60 * 24 * 1000,
+  });
+
   res.json({ token, userId: user._id, username: user.username });
+  
 });
 
 
 
 // Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/task-manager", {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -166,7 +206,7 @@ app.put("/tasks/:taskId", async (req, res) => {
 
 
 // Start the server
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

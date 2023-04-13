@@ -18,6 +18,8 @@ Modal.setAppElement("#root");
 
 function App() {
   const [tasks, setTasks] = useState([]);
+  const [activeTasks, setActiveTasks] = useState([]);
+  const [finishedTasks, setFinishedTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,16 +45,30 @@ function App() {
 
   
   const createTask = async (start, end) => {
+    if (title.trim() === "") {
+      alert("Task title cannot be empty.");
+      return;
+    }
+
+    if (description.trim() === "") {
+      alert("Task description cannot be empty.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
+    const currentTime = new Date();
+    const taskEndTime = new Date(end || taskDate.end);
+  
+    const isTaskCompleted = taskEndTime <= currentTime;
   
     await axios.post("http://localhost:5001/tasks", {
       title,
       description,
       start: new Date(start || taskDate.start).toISOString(),
-      end: new Date(end || taskDate.end).toISOString(),
-      completed: false,
+      end: taskEndTime.toISOString(),
+      completed: isTaskCompleted,
       priority,
       userId,
     });
@@ -60,7 +76,7 @@ function App() {
     setDescription("");
     setTaskDate({ start: null, end: null });
     fetchTasks();
-    console.log(start,end,'this is the start and end time.')
+    console.log(start, end, "this is the start and end time.");
   };
 
   const formatTasks = (tasks) => {
@@ -84,6 +100,15 @@ function App() {
   };
 
   const updateTask = async (start, end) => {
+    if (title.trim() === "") {
+      alert("Task title cannot be empty.");
+      return;
+    }
+
+    if (description.trim() === "") {
+      alert("Task description cannot be empty.");
+      return;
+    }
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
@@ -130,33 +155,84 @@ function App() {
   
     try {
       const response = await axios.get(`http://localhost:5001/tasks/${userId}`, {
-
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setTasks(formatTasks(response.data));
+  
+      const fetchedTasks = formatTasks(response.data);
+      const currentTime = new Date();
+      const activeTasks = fetchedTasks.filter(
+        (task) => !task.completed && new Date(task.end) > currentTime
+      );
+      const finishedTasks = fetchedTasks.filter(
+        (task) => task.completed || new Date(task.end) <= currentTime
+      );
+  
+      setActiveTasks(activeTasks);
+      setFinishedTasks(finishedTasks);
+      setTasks(fetchedTasks);
+
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   }, []);
+
+  // const updateTaskStatus = useCallback(() => {
+  //   const currentTime = new Date();
+  //   const updatedActiveTasks = activeTasks.filter(
+  //     (task) => new Date(task.end) > currentTime
+  //   );
+  //   const updatedFinishedTasks = [
+  //     ...finishedTasks,
+  //     ...activeTasks.filter((task) => new Date(task.end) <= currentTime),
+  //   ];
+  
+  //   setActiveTasks(updatedActiveTasks);
+  //   setFinishedTasks(updatedFinishedTasks);
+  // }, [activeTasks, finishedTasks]);
+  
+
+  // useEffect(() => {
+  //   updateTaskStatus();
+  // }, [activeTasks, updateTaskStatus]);
+  
+
+  const handleTaskCompletion = async (taskId) => {
+    try {
+      await axios.put(
+        `http://localhost:5001/tasks/${taskId}`,
+        { completed: true },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+  
+      fetchTasks(); 
+    } catch (error) {
+      console.error("Error marking task as complete:", error);
+    }
+  };
+  
+  
 
   // function toggleSidebar() {
   //   setShowSidebar(!showSidebar);
   // }
   
   
-  const checkAuthentication = async () => {
+  // const checkAuthentication = async () => {
+  //   const authStatus = localStorage.getItem("isAuthenticated");
+  //   if (authStatus) {
+  //     setIsAuthenticated(true);
+  //   }
+  // };
+  
+  useEffect(() => {
     const authStatus = localStorage.getItem("isAuthenticated");
     if (authStatus) {
       setIsAuthenticated(true);
     }
-  };
-  
-  useEffect(() => {
-    (async () => {
-      await checkAuthentication();
-    })();
   }, []);
   
 
@@ -181,17 +257,17 @@ function App() {
     []
   );
 
-  const handleAuthentication = (authData) => {
+  const handleAuthentication = useCallback((authData) => {
     console.log("Authentication data:", authData);
     setIsAuthenticated(true);
     localStorage.setItem("isAuthenticated", true);
     localStorage.setItem("token", authData.token);
-    
+  
     setUsername(authData.username);
     localStorage.setItem("username", authData.username);
-
+  
     fetchTasks();
-  };
+  }, [fetchTasks]);
   
   
   
@@ -290,10 +366,16 @@ function App() {
       </div>
       <div>
   
-        {showSidebar && <TaskSidebar onClose={() => setShowSidebar(false)}
-        tasks={tasks}
+      {showSidebar && (
+      <TaskSidebar
+        onClose={() => setShowSidebar(false)}
+        activeTasks={activeTasks}
+        finishedTasks={finishedTasks}
         onEditTask={handleEditTask}
-        onRemoveTask={handleRemoveTask} />}
+        onCompleteTask={handleTaskCompletion}
+        onRemoveTask={handleRemoveTask}
+      />
+      )}
   
         <div className="app-container">
           <div
