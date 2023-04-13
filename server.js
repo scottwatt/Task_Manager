@@ -21,14 +21,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Create an Express app
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
 app.use(cors({
   origin: process.env.REACT_APP_URL || 'http://localhost:3000',
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.use(express.json());
+app.use(cookieParser());
 // Signup route
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
