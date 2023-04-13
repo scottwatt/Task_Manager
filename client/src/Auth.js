@@ -1,6 +1,7 @@
 // client/src/Auth.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+require("dotenv").config();
 
 const Auth = ({ onAuthenticated }) => {
   const [email, setEmail] = useState("");

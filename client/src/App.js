@@ -12,6 +12,8 @@ import "./Modal.css";
 import "./authStyles.css";
 import "./responsive.css"
 import 'font-awesome/css/font-awesome.min.css';
+require("dotenv").config();
+
 
 
 Modal.setAppElement("#root");
