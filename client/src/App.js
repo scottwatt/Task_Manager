@@ -12,7 +12,6 @@ import "./Modal.css";
 import "./authStyles.css";
 import "./responsive.css"
 import 'font-awesome/css/font-awesome.min.css';
-require("dotenv").config();
 
 
 
@@ -65,7 +64,7 @@ function App() {
   
     const isTaskCompleted = taskEndTime <= currentTime;
   
-    await axios.post(`${REACT_APP_URL}/tasks`, {
+    await axios.post(`${process.env.REACT_APP_URL}/tasks`, {
       title,
       description,
       start: new Date(start || taskDate.start).toISOString(),
@@ -115,7 +114,7 @@ function App() {
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
   
-    await axios.put(`${REACT_APP_URL}/tasks/${currentTaskId}`, {
+    await axios.put(`${process.env.REACT_APP_URL}/tasks/${currentTaskId}`, {
       title,
       description,
       start: new Date(start || taskDate.start).toISOString(),
@@ -138,7 +137,7 @@ function App() {
   
   const handleRemoveTask = async (taskId) => {
     try {
-      await axios.delete(`${REACT_APP_URL}/tasks/${taskId}`, {
+      await axios.delete(`${process.env.REACT_APP_URL}/tasks/${taskId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       console.log('taskId:', taskId);
@@ -156,7 +155,7 @@ function App() {
     const userId = decodedToken.userId;
   
     try {
-      const response = await axios.get(`${REACT_APP_URL}/tasks/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_URL}/tasks/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -203,7 +202,7 @@ function App() {
   const handleTaskCompletion = async (taskId) => {
     try {
       await axios.put(
-        `${REACT_APP_URL}/tasks/${taskId}`,
+        `${process.env.REACT_APP_URL}/tasks/${taskId}`,
         { completed: true },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
