@@ -12,8 +12,8 @@ const Auth = ({ onAuthenticated }) => {
     e.preventDefault();
 
     const url = isSignup
-      ? "http://localhost:5001/signup"
-      : "http://localhost:5001/login";
+      ? `${process.env.REACT_APP_URL}/signup`
+      : `${process.env.REACT_APP_URL}/login`;
     const userData = isSignup ? { email, password, username } : { email, password };
 
     try {

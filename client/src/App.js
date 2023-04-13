@@ -63,7 +63,7 @@ function App() {
   
     const isTaskCompleted = taskEndTime <= currentTime;
   
-    await axios.post("http://localhost:5001/tasks", {
+    await axios.post(`${REACT_APP_URL}/tasks`, {
       title,
       description,
       start: new Date(start || taskDate.start).toISOString(),
@@ -113,7 +113,7 @@ function App() {
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
   
-    await axios.put(`http://localhost:5001/tasks/${currentTaskId}`, {
+    await axios.put(`${REACT_APP_URL}/tasks/${currentTaskId}`, {
       title,
       description,
       start: new Date(start || taskDate.start).toISOString(),
@@ -136,7 +136,7 @@ function App() {
   
   const handleRemoveTask = async (taskId) => {
     try {
-      await axios.delete(`http://localhost:5001/tasks/${taskId}`, {
+      await axios.delete(`${REACT_APP_URL}/tasks/${taskId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       console.log('taskId:', taskId);
@@ -154,7 +154,7 @@ function App() {
     const userId = decodedToken.userId;
   
     try {
-      const response = await axios.get(`http://localhost:5001/tasks/${userId}`, {
+      const response = await axios.get(`${REACT_APP_URL}/tasks/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -201,7 +201,7 @@ function App() {
   const handleTaskCompletion = async (taskId) => {
     try {
       await axios.put(
-        `http://localhost:5001/tasks/${taskId}`,
+        `${REACT_APP_URL}/tasks/${taskId}`,
         { completed: true },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
