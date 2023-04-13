@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 
 const bcrypt = require("bcryptjs");
@@ -202,6 +203,15 @@ app.put("/tasks/:taskId", async (req, res) => {
     res.status(500).json({ message: "Error updating task" });
   }
 });
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client/build", "index.html"));
+  });
+}
 
 
 
