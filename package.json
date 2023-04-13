@@ -9,7 +9,7 @@
     "start": "node server.js",
     "client": "cd client && npm start",
     "build": "cd client && npm run build",
-    "heroku-postbuild": "cd client && npm ci --only=production",
+    "heroku-postbuild": "cd client && npm install && npm run build",
     "dev": "concurrently \"npm start\" \"npm run client\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d client/build"
